@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
 
+import './index.css';
+import 'remixicon/fonts/remixicon.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Login from './pages/login';
+import Home from './pages/home';
+import Register from './pages/register';
+import { Toaster } from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import ProtectedRoute from './components/ProtectedRoute';
+import Loader from './components/Loader';
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const { loader } = useSelector(state => state.loaderReducer);
+	return (
+		<div>
+			<Toaster position="top-center" reverseOrder={false} />
+			{loader && <Loader />}
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={
+						<ProtectedRoute>
+							<Home />
+						</ProtectedRoute>
+					} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/register" element={<Register />} />
+				</Routes>
+
+			</BrowserRouter>
+		</div>
+	);
 }
 
 export default App;
