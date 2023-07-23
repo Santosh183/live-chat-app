@@ -14,7 +14,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 
 app.use(express.json());
-const server = require('http').createServer();
+const server = require('http').createServer(app);
 
 const io = require("socket.io")(server, {
     cors: {
@@ -24,13 +24,20 @@ const io = require("socket.io")(server, {
     }
 })
 io.on('connection', (socket) => {
-    console.log('connected with socketid' + ' : ' + socket.id);
+    socket.on('join-room', (userId) => {
+        socket.join(userId);
+    });
+    // send message to members in chat room
+    socket.on('send-message', (message) => {
+        io.to(message.members[0]).to(message.members[1]).emit('receive-message', message)
+    });
 })
 
 app.use('/api/users/', userRoutes);
 app.use('/api/chats/', chatRoutes);
 app.use('/api/messages/', messageRoutes);
 
+// app.listen would be listening to normal api
 server.listen(port, () => {
     console.log(`server is running on port ${port}`);
 })
