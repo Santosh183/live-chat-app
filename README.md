@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Live chat app with MERN stack
 
 Live chat app created with MERN stack.
 
