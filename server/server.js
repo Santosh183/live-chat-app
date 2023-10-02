@@ -23,6 +23,7 @@ const io = require("socket.io")(server, {
 
     }
 })
+let onlineUsers = []; // kept outside so that data will not get reset on refresh of connection
 io.on('connection', (socket) => {
     socket.on('join-room', (userId) => {
         socket.join(userId);
@@ -31,6 +32,25 @@ io.on('connection', (socket) => {
     socket.on('send-message', (message) => {
         io.to(message.members[0]).to(message.members[1]).emit('receive-message', message)
     });
+
+    socket.on('clear-unread-messages', (data) => {
+        io.to(data.members[0]).to(data.members[1]).emit('unread-messages-cleared', data)
+    });
+
+    socket.on('typing', (data) => {
+        io.to(data.members[0])
+            .to(data.members[1])
+            .emit('started-typing', data)
+    });
+
+    // online users 
+    socket.on('came-online', (userId) => {
+        if (!onlineUsers.includes(userId)) {
+            onlineUsers.push(userId);
+        }
+        socket.emit('online-users', onlineUsers);
+    });
+
 })
 
 app.use('/api/users/', userRoutes);
